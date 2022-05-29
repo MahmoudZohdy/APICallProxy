@@ -1,0 +1,519 @@
+#include <ntifs.h>
+#include <ntddk.h>
+#include <wdm.h>
+#include "IOCTLCodes.h"
+#include "Struct.h"
+#include "CommonStruct.h"
+#include "Prototypes.h"
+#include "FileSystem.h"
+#include "Process.h"
+#include "Thread.h"
+#include "General.h"
+#include "Utility.h"
+
+
+// DriverEntry
+NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath) {
+	UNREFERENCED_PARAMETER(RegistryPath);
+
+	DriverObject->DriverUnload = APIProxyUnload;
+
+	DriverObject->MajorFunction[IRP_MJ_CREATE] = APIProxyCreateClose;
+	DriverObject->MajorFunction[IRP_MJ_CLOSE] = APIProxyCreateClose;
+	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = APIProxyDeviceControl;
+
+	UNICODE_STRING devName = RTL_CONSTANT_STRING(L"\\Device\\APICallProxy");
+	PDEVICE_OBJECT DeviceObject;
+	NTSTATUS status = IoCreateDevice(DriverObject, 0, &devName, FILE_DEVICE_UNKNOWN, 0, FALSE, &DeviceObject);
+	if (!NT_SUCCESS(status)) {
+		DbgPrint("Failed to create device (0x%08X)\n", status);
+		return status;
+	}
+
+	UNICODE_STRING symLink = RTL_CONSTANT_STRING(L"\\??\\APICallProxy");
+	status = IoCreateSymbolicLink(&symLink, &devName);
+	if (!NT_SUCCESS(status)) {
+		DbgPrint("Failed to create symbolic link (0x%08X)\n", status);
+		IoDeleteDevice(DeviceObject);
+		return status;
+	}
+
+	return status;
+}
+
+void APIProxyUnload(_In_ PDRIVER_OBJECT DriverObject) {
+	UNICODE_STRING symLink = RTL_CONSTANT_STRING(L"\\??\\APICallProxy");
+	// delete symbolic link
+	IoDeleteSymbolicLink(&symLink);
+
+	// delete device object
+	IoDeleteDevice(DriverObject->DeviceObject);
+
+}
+
+_Use_decl_annotations_
+NTSTATUS APIProxyCreateClose(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
+	UNREFERENCED_PARAMETER(DeviceObject);
+
+	Irp->IoStatus.Status = STATUS_SUCCESS;
+	Irp->IoStatus.Information = 0;
+	IoCompleteRequest(Irp, IO_NO_INCREMENT);
+	return STATUS_SUCCESS;
+}
+
+_Use_decl_annotations_
+NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
+
+	auto stack = IoGetCurrentIrpStackLocation(Irp);
+	NTSTATUS Status = STATUS_SUCCESS;
+	ULONG DataWritten = 0;
+	ULONG IoctlCode = stack->Parameters.DeviceIoControl.IoControlCode;
+	auto DataSize = stack->Parameters.DeviceIoControl.InputBufferLength;
+	auto OutDataSize = stack->Parameters.DeviceIoControl.OutputBufferLength;
+	auto UserData = (PVOID*)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+	auto OutBuffer = (PVOID*)Irp->UserBuffer;
+
+	__try {
+		// check the user buffer, as the default methd is NEITHER
+		ProbeForRead(UserData, DataSize, sizeof(UCHAR));
+		ProbeForWrite(OutBuffer, OutDataSize, sizeof(UCHAR));
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		Status = STATUS_ACCESS_VIOLATION;
+		goto Finish;
+	}
+
+	switch (IoctlCode) {
+		//the return status doese not represent if the file was overwritten or created use openfile to check if file present first
+	case IOCTL_API_PROXY_CREATEFILE:
+	{
+		if (DataSize < sizeof(CreateFileInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+		HANDLE FileHandle = NULL;
+
+		Status = APIProxyCreateFile((CreateFileInfo*)UserData, &FileHandle);
+
+		HANDLE* Output = (HANDLE*)OutBuffer;
+		*Output = FileHandle;
+
+		DataWritten = sizeof(HANDLE);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_OPENFILE:
+	{
+		auto FileInfo = (CreateFileInfo*)UserData;
+
+		HANDLE FileHandle = NULL;
+		Status = APIProxyOpenFile(FileInfo, &FileHandle);
+
+		HANDLE* Output = (HANDLE*)OutBuffer;
+		*Output = FileHandle;
+
+		DataWritten = sizeof(HANDLE);
+
+	}
+
+	break;
+
+
+	case IOCTL_API_PROXY_DELETEFILE:
+	{
+		auto FileName = (WCHAR*)UserData;
+		Status = APIProxyDeleteFile(FileName);
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_CLOSE_HANDLE:
+	{
+		auto FileHandle = (HANDLE*)UserData;
+
+		if (DataSize < sizeof(HANDLE)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyCloseHandle(FileHandle);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_WRITEFILE:
+	{
+		auto WriteInfo = (ReadWriteData*)UserData;
+
+		if (DataSize < sizeof(ReadWriteData)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyWriteFile(WriteInfo);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_READFILE:
+	{
+		auto ReadInfo = (ReadWriteData*)UserData;
+
+		if (DataSize < sizeof(ReadWriteData)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyReadFile(ReadInfo);
+
+		break;
+	}
+
+	case IOCTL_API_PROXY_GET_FILE_SIZE_FROM_HANDLE:
+	{
+		auto FileHandle = (HANDLE*)UserData;
+		FILE_STANDARD_INFORMATION FileInfo{};
+
+		if (DataSize < sizeof(HANDLE)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyGetFileSize(FileHandle, &FileInfo);
+
+		RtlCopyMemory(OutBuffer, &(FileInfo.EndOfFile), sizeof(LARGE_INTEGER));
+
+		DataWritten = sizeof(LARGE_INTEGER);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_TERMINATE_PROCESS:
+	{
+		auto PID = (DWORD64*)UserData;
+
+		if (DataSize < sizeof(DWORD64)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyTerminateProcess(PID);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_GET_PID_FROM_PROCESSNAME:
+	{
+		auto ProcessName = (WCHAR*)UserData;
+
+		if (DataSize == 0) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		DWORD64 PID = APIProxyGetPIDFromProcessName(ProcessName);
+		if (PID == 0) {
+			Status = STATUS_UNSUCCESSFUL;
+		}
+
+		DWORD64* Output = (DWORD64*)OutBuffer;
+		*Output = PID;
+
+		DataWritten = sizeof(DWORD64);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_OPEN_PROCESS:
+	{
+		auto PID = (DWORD64*)UserData;
+		HANDLE ProcessHandle = NULL;
+
+		if (DataSize < sizeof(DWORD64)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyOpenProcess((HANDLE*)PID, &ProcessHandle);
+
+		HANDLE* Output = (HANDLE*)OutBuffer;
+		*Output = ProcessHandle;
+
+		DataWritten = sizeof(HANDLE);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_OPEN_THREAD:
+	{
+		auto TID = (HANDLE*)UserData;
+		HANDLE ThreadHandle = NULL;
+
+		if (DataSize < sizeof(HANDLE)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyOpenThread(TID, &ThreadHandle);
+
+		HANDLE* Output = (HANDLE*)OutBuffer;
+		*Output = ThreadHandle;
+
+		DataWritten = sizeof(HANDLE);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_QUERY_SYSTEM_INFORMATION:
+	{
+		auto SystemInfo = (QuerySystemInformationInfo*)UserData;
+
+		if (DataSize < sizeof(QuerySystemInformationInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyQuerySystemInformation(SystemInfo->InformationClass, SystemInfo->Data, &SystemInfo->DataSize);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_CREATE_REMOTE_THREAD:
+	{
+
+		// TODO
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_ALLOCATE_MEMORY_IN_PROCESS_USING_HANDLE:
+	{
+		auto AllocateMemoryInfo = (AllocateVirtualMeomryInfo*)UserData;
+
+		if (DataSize < sizeof(AllocateVirtualMeomryInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyAllocateVirtualMemory(AllocateMemoryInfo);
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_WRITE_PROCESS_MEMORY:
+	{
+		auto WriteMemoryInfo = (ReadWriteVirtualMemoryInfo*)UserData;
+
+		if (DataSize < sizeof(ReadWriteVirtualMemoryInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyWriteVirtualMemory(WriteMemoryInfo);
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_READ_PROCESS_MEMORY:
+	{
+		auto ReadMemoryInfo = (ReadWriteVirtualMemoryInfo*)UserData;
+
+		if (DataSize < sizeof(ReadWriteVirtualMemoryInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyReadVirtualMemory(ReadMemoryInfo);
+	}
+
+	break;
+
+	//ObReferenceObjectByHandle use handle insted of PID
+	case IOCTL_API_PROXY_SUSPEND_PROCESS:
+	{
+		auto ProcessHandle = (HANDLE*)UserData;
+
+		if (DataSize < sizeof(HANDLE)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxySuspendProcess(ProcessHandle);
+	}
+
+	break;
+	case IOCTL_API_PROXY_RESUME_PROCESS:
+	{
+		auto ProcessHandle = (HANDLE*)UserData;
+
+		if (DataSize < sizeof(HANDLE)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyResumeProcess(ProcessHandle);
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_SUSPEND_THREAD:
+	{
+		// TODO
+
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_RESUME_THREAD:
+	{
+		// TODO
+
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_CREATE_SECTION:
+	{
+		auto SectionInfo = (CreateSectionInfo*)UserData;
+		HANDLE SectionHandle = NULL;
+
+		if (DataSize < sizeof(CreateSectionInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyCreateSection(SectionInfo, &SectionHandle);
+
+		HANDLE* Output = (HANDLE*)OutBuffer;
+		*Output = SectionHandle;
+
+		DataWritten = sizeof(HANDLE);
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_MAP_VIEW_OF_SECTION:
+	{
+		auto MapInfo = (MapViewOfSectionInfo*)UserData;
+
+		if (DataSize < sizeof(MapViewOfSectionInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyMapViewOfSection(MapInfo);
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_UNMAP_VIEW_OF_SECTION:
+	{
+		auto UnMapInfo = (UNMapViewOfSectionInfo*)UserData;
+
+		if (DataSize < sizeof(UNMapViewOfSectionInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyUnMapViewOfSection(UnMapInfo);
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_OPEN_SECTION:
+	{
+		auto SectionInfo = (OpenSectionInfo*)UserData;
+		HANDLE SectionHandle = NULL;
+
+		if (DataSize < sizeof(OpenSectionInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyOpenSection(SectionInfo, &SectionHandle);
+
+		HANDLE* Output = (HANDLE*)OutBuffer;
+		*Output = SectionHandle;
+
+		DataWritten = sizeof(HANDLE);
+
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_SET_THREAD_CONTEXT:
+	{
+		auto ThreadInfo = (ThreadContextInfo*)UserData;
+
+		if (DataSize < sizeof(ThreadContextInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxySetThreadContext(ThreadInfo);
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_GET_THREAD_CONTEXT:
+	{
+		auto ThreadInfo = (ThreadContextInfo*)UserData;
+
+		if (DataSize < sizeof(ThreadContextInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyGetThreadContext(ThreadInfo);
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_VIRTUAL_PROTECT:
+	{
+		auto MemoryProtectionInfo = (VirtualProtectInfo*)UserData;
+
+		if (DataSize < sizeof(VirtualProtectInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyProtectVirtualMemory(MemoryProtectionInfo);
+	}
+
+	break;
+
+	case IOCTL_API_PROXY_QUEUE_APC:
+	{
+		auto APCInfo = (QueueUSerApcInfo*)UserData;
+
+		if (DataSize < sizeof(QueueUSerApcInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyQueueUserAPC(APCInfo);
+	}
+
+	case API_PROXY_LOAD_DRIVER:
+	{
+		// TODO
+
+	}
+	break;
+	break;
+
+	default:
+		Status = STATUS_INVALID_DEVICE_REQUEST;
+		break;
+	}
+
+Finish:
+
+	Irp->IoStatus.Status = Status;
+	Irp->IoStatus.Information = DataWritten;
+	IoCompleteRequest(Irp, IO_NO_INCREMENT);
+	return Status;
+}
+
