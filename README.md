@@ -57,9 +57,5 @@ i tested the Driver and the client communication on windows 10 0x64 and window 8
 - [x] **Get_ProcessID_From_Process_Name**         not windows API but usefull utility (can use ZwQuerySystemInformation to do the same)
 
 
-# Contact:
-
-Kindly let me know if you faced any crash, need some clarefication, or have any comment for improvement you can reach out to me on my twitter @7odaZohdy or by mail abdelaziz.zohdy@gmail.com 
-
 # License:
 MIT
