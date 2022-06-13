@@ -64,17 +64,18 @@ NTSTATUS APIProxyReadVirtualMemory(ReadWriteVirtualMemoryInfo* ReadMemoryInfo) {
 	Status = ObReferenceObjectByHandle(ReadMemoryInfo->ProcessHandle, PROCESS_ALL_ACCESS, *PsProcessType, KernelMode, (PVOID*)&Process, NULL);
 
 	if (!NT_SUCCESS(Status)) {
+		DbgPrint("APICallProxy: Error Refrence process using ObReferenceObjectByHandle Failed Status Code %x\n", Status);
 		return Status;
 	}
 
-
 	__try {
 
+		// TODO there is crash if the address in not valid
 		SIZE_T Result;
 		Status = MmCopyVirtualMemory(Process, ReadMemoryInfo->BaseAddress, PsGetCurrentProcess(), ReadMemoryInfo->Data, ReadMemoryInfo->DataLen, KernelMode, &Result);
 #if DEBUG
 		if (!NT_SUCCESS(Status))
-			DbgPrint("APICallProxy: Error Reading Virtual Address Space using MmCopyVirtualMemory  Failed Status Code %x\n", Status);
+			DbgPrint("APICallProxy: Error Reading Virtual Address Space using MmCopyVirtualMemory  Failed Status Code %x  %x\n", Status, Result);
 #endif
 
 	}

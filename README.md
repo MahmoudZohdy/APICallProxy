@@ -57,5 +57,9 @@ i tested the Driver and the client communication on windows 10 0x64 and window 8
 - [x] **Get_ProcessID_From_Process_Name**         not windows API but usefull utility (can use ZwQuerySystemInformation to do the same)
 
 
+# Reference
+
+https://github.com/hfiref0x/DSEFix 
+
 # License:
 MIT
