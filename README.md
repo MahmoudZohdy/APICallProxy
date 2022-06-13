@@ -5,7 +5,7 @@ This Project is for Windows API Call Obfuscation to make static/Dynamic analysis
 It Work by replacing normal calls to windows API like **CreateFile**, **WriteFile**, **OpenProcess**,.. with a **DeviceIoControl** with the appropriate **IOCTL** code
 
 ```
-I Create a sample Client that will do APC injection as demo, and i will try to add more demo soon and implement more Windows API
+I Create a sample Client that will do APC injection and a sample code to do Disable Signing Policy(DSE), and i will try to add more demo soon and implement more Windows API
 
 Note that the APCInjector.exe only work as x64 bit application on x64 bit windows because the shellcode is x64 bit
 
