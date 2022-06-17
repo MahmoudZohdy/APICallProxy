@@ -167,8 +167,9 @@ NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 
 		Status = APIProxyReadFile(ReadInfo);
 
-		break;
 	}
+
+	break;
 
 	case IOCTL_API_PROXY_GET_FILE_SIZE_FROM_HANDLE:
 	{
@@ -329,7 +330,6 @@ NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 
 	break;
 
-	//ObReferenceObjectByHandle use handle insted of PID
 	case IOCTL_API_PROXY_SUSPEND_PROCESS:
 	{
 		auto ProcessHandle = (HANDLE*)UserData;
@@ -343,6 +343,7 @@ NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 	}
 
 	break;
+
 	case IOCTL_API_PROXY_RESUME_PROCESS:
 	{
 		auto ProcessHandle = (HANDLE*)UserData;
@@ -496,12 +497,32 @@ NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 		Status = APIProxyQueueUserAPC(APCInfo);
 	}
 
-	case API_PROXY_LOAD_DRIVER:
+	break;
+
+	case IOCTL_API_PROXY_LOAD_DRIVER:
 	{
-		// TODO
+		auto UserRegPath = (WCHAR*)UserData;
+		UNICODE_STRING RegPath;
+
+		// must copy the registry path from User Mode buffer to Kernel mode buffer (the method used in communication is METHOD_NEITHER)
+		WCHAR SystemRegPath[500];
+		wcscpy(SystemRegPath, UserRegPath);
+
+		RtlInitUnicodeString(&RegPath, SystemRegPath);
+		Status = ZwLoadDriver(&RegPath);
 
 	}
 	break;
+
+	case IOCTL_API_PROXY_UNLOAD_DRIVER:
+	{
+		auto UserRegPath = (WCHAR*)UserData;
+		UNICODE_STRING RegPath;
+
+		RtlInitUnicodeString(&RegPath, UserRegPath);
+		Status = ZwUnloadDriver(&RegPath);
+
+	}
 	break;
 
 	default:

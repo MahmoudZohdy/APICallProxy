@@ -132,7 +132,7 @@ int main(int argc, WCHAR* argv[])
 	DWORD64 ShellCodeSize = 528;
 	BYTE* ShellCode = scode;
 
-	printf("This sample only works on x64 Bit OS as x64 Bit Application, you will need to change the ShellCode\n");
+	printf("This sample only works on win10 x64 Bit OS as x64 Bit Application\n");
 	
 	HANDLE hDevice = CreateFile(L"\\\\.\\APICallProxy", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (hDevice == INVALID_HANDLE_VALUE) {

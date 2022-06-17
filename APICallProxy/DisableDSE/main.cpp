@@ -41,6 +41,7 @@ BOOL LoadDriver(LPCWSTR ServiceName, LPCWSTR DriverPath, DWORD StartType, BOOL D
 
 int main(int argc, WCHAR* argv[])
 {
+
 	BOOL Status = 1;
 	DWORD returned;
 	PRTL_PROCESS_MODULES ModuleInfo;
