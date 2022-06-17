@@ -38,6 +38,12 @@ typedef struct _AllocateVirtualMeomryInfo {
 
 } AllocateVirtualMeomryInfo, * PAllocateVirtualMeomryInfo;
 
+typedef struct _FreeVirtualMeomryInfo {
+	_In_ HANDLE     ProcessHandle;
+	_Inout_ PVOID	BaseAddress;
+
+} FreeVirtualMeomryInfo, * PFreeVirtualMeomryInfo;
+
 typedef struct _ReadWriteVirtualMemoryInfo {
 	_In_ HANDLE     ProcessHandle;
 	_In_ SIZE_T	    DataLen;

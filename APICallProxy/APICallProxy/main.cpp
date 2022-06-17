@@ -302,6 +302,19 @@ NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 
 	break;
 
+	case IOCTL_API_PROXY_FREE_MEMORY_IN_PROCESS_USING_HANDLE:
+	{
+		auto FreeMemoryInfo = (FreeVirtualMeomryInfo*)UserData;
+
+		if (DataSize < sizeof(FreeVirtualMeomryInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+		Status = APIProxyFreeVirtualMemory(FreeMemoryInfo);
+	}
+
+	break;
+
 	case IOCTL_API_PROXY_WRITE_PROCESS_MEMORY:
 	{
 		auto WriteMemoryInfo = (ReadWriteVirtualMemoryInfo*)UserData;
@@ -509,7 +522,7 @@ NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 		wcscpy(SystemRegPath, UserRegPath);
 
 		RtlInitUnicodeString(&RegPath, SystemRegPath);
-		Status = ZwLoadDriver(&RegPath);
+		Status = APIProxyLoadDriver(&RegPath);
 
 	}
 	break;
@@ -520,7 +533,7 @@ NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 		UNICODE_STRING RegPath;
 
 		RtlInitUnicodeString(&RegPath, UserRegPath);
-		Status = ZwUnloadDriver(&RegPath);
+		Status = APIProxyUnLoadDriver(&RegPath);
 
 	}
 	break;

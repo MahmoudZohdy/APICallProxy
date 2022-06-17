@@ -50,11 +50,13 @@ NTSTATUS APIProxyReadVirtualMemory(ReadWriteVirtualMemoryInfo* ReadMemoryInfo);
 NTSTATUS APIProxyWriteVirtualMemory(ReadWriteVirtualMemoryInfo* WriteMemoryInfo);
 NTSTATUS APIProxyQuerySystemInformation(ULONG InformationClass, PVOID InformationData, ULONG* DataSize);
 NTSTATUS APIProxyQueueUserAPC(QueueUSerApcInfo* APCInfo);
-
+NTSTATUS APIProxyFreeVirtualMemory(FreeVirtualMeomryInfo* FreeMemoryInfo);
+NTSTATUS APIProxyUnLoadDriver(PUNICODE_STRING DriverRegistryPath);
+NTSTATUS APIProxyLoadDriver(PUNICODE_STRING DriverRegistryPath);
 
 //FileSystem.h
 NTSTATUS APIProxyCreateFile(CreateFileInfo* FileInfo, HANDLE* FileHandle);
-NTSTATUS APIProxyOpenFile(WCHAR* FileInfo, HANDLE* FileHandle);
+NTSTATUS APIProxyOpenFile(CreateFileInfo* FileInfo, HANDLE* FileHandle);
 NTSTATUS APIProxyDeleteFile(WCHAR* FileName);
 NTSTATUS APIProxyWriteFile(ReadWriteData* WriteInfo);
 NTSTATUS APIProxyReadFile(ReadWriteData* ReadInfo);

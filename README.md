@@ -28,6 +28,7 @@ i tested the Driver and the client communication on windows 10 0x64 and window 8
 - [x] **GetFileSize**
 - [x] **ZwQuerySystemInformation**
 - [x] **ZwAllocateVirtualMemory**
+- [x] **ZwFreeVirtualMemory**
 - [x] **VirtualProtectEx**
 - [x] **WriteProcessMemory**
 - [x] **ReadProcessMemory**
