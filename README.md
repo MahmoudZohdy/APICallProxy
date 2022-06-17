@@ -50,8 +50,8 @@ i tested the Driver and the client communication on windows 10 0x64 and window 8
 - [ ] **RegQueryValueW**
 - [ ] **RegRenameKey**
 - [ ] **RegSetValueW**
-- [ ] **NtLoadDriver**
-- [ ] **NtUnloadDriver**
+- [x] **ZwLoadDriver**
+- [x] **ZwUnloadDriver**
 
 
 - [x] **Get_ProcessID_From_Process_Name**         not windows API but usefull utility (can use ZwQuerySystemInformation to do the same)
