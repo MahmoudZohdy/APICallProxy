@@ -33,8 +33,10 @@ NTSTATUS APIProxyOpenThread(HANDLE* TID, HANDLE* ThreadHandle) {
 
 NTSTATUS APIProxyGetThreadContext(ThreadContextInfo* ThreadInfo) {
 	NTSTATUS Status = STATUS_SUCCESS;
-
 	PETHREAD pThread;
+
+	__try {
+
 	Status = PsLookupThreadByThreadId((HANDLE)ThreadInfo->ThreadID, &pThread);
 	if (!NT_SUCCESS(Status)) {
 		return Status;
@@ -42,19 +44,50 @@ NTSTATUS APIProxyGetThreadContext(ThreadContextInfo* ThreadInfo) {
 	Status = PsGetContextThread(pThread, &ThreadInfo->ThreadContext, UserMode);
 	ObDereferenceObject(pThread);
 
+#if DEBUG
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("APICallProxy: Error Get Thread Context Status Code 0x%x\n", Status);
+	}
+#endif 
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+
+		Status = STATUS_ACCESS_VIOLATION;
+#if DEBUG
+		DbgPrint("APICallProxy: Error Access Violation while Get Thread Context Status Code 0x%x\n", Status);
+#endif
+
+	}
 	return Status;
 }
 
 NTSTATUS APIProxySetThreadContext(ThreadContextInfo* ThreadInfo) {
 	NTSTATUS Status = STATUS_SUCCESS;
-
 	PETHREAD pThread;
+
+	__try {
+
 	Status = PsLookupThreadByThreadId((HANDLE)ThreadInfo->ThreadID, &pThread);
 	if (!NT_SUCCESS(Status)) {
 		return Status;
 	}
 	Status = PsSetContextThread(pThread, &ThreadInfo->ThreadContext, UserMode);
 	ObDereferenceObject(pThread);
+
+#if DEBUG
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("APICallProxy: Error Set Thread Context Status Code 0x%x\n", Status);
+	}
+#endif 
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+
+		Status = STATUS_ACCESS_VIOLATION;
+#if DEBUG
+		DbgPrint("APICallProxy: Error Access Violation while Set Thread Context Status Code 0x%x\n", Status);
+#endif
+
+	}
 
 	return Status;
 }

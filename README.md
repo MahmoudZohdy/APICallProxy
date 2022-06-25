@@ -4,12 +4,19 @@ This Project is for Windows API Call Obfuscation to make static/Dynamic analysis
 
 It Work by replacing normal calls to windows API like **CreateFile**, **WriteFile**, **OpenProcess**,.. with a **DeviceIoControl** with the appropriate **IOCTL** code
 
+So if you want to Create File insted of calling **CreateFile()** API you call **DeviceIoControl()** with IOCTL Code **IOCTL_API_PROXY_CREATEFILE**
+
 ```
-I Create a sample Client that will do APC injection and a sample code to do Disable Signing Policy(DSE), and i will try to add more demo soon and implement more Windows API
+I Create sample Client that will do the following:
+1 - APCInjection.exe : APC injection 
+2 - DisableDSE.exe : Sample code to Disable Signing Policy(DSE)
+3-  RegisterLoadDriver.exe : Register and Load Driver using DeviceIoControl()
 
 Note that the APCInjector.exe only work as x64 bit application on x64 bit windows because the shellcode is x64 bit
 
 i tested the Driver and the client communication on windows 10 0x64 and window 8.1 x64/x86 bit
+
+The Communication Between the Driver and User-mode happens using METHOD_NEITHER i made it very easy to change the communication method (METHOD_BUFFERED,..), you only need to change a couple of lines in the source code and it will work normally
 ```
 
 
@@ -44,13 +51,10 @@ i tested the Driver and the client communication on windows 10 0x64 and window 8
 - [ ] **CreateRemoteThread**
 - [ ] **ResumeThread**
 - [ ] **SuspendThread**
-- [ ] **RegCreateKeyW**
-- [ ] **RegDeleteKeyW**
-- [ ] **RegGetValueW**
-- [ ] **RegEnumValueW**
-- [ ] **RegQueryValueW**
-- [ ] **RegRenameKey**
-- [ ] **RegSetValueW**
+- [x] **RegCreateKey**
+- [x] **RegDeleteKey**
+- [x] **RegQueryValue**
+- [x] **RegSetValue**
 - [x] **ZwLoadDriver**
 - [x] **ZwUnloadDriver**
 

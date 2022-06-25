@@ -36,52 +36,57 @@ BOOLEAN NTAPI KeInsertQueueApc(_Inout_ PRKAPC Apc, _In_opt_ PVOID SystemArgument
 EXTERN_C_END
 
 // prototypes
-
 void APIProxyUnload(_In_ PDRIVER_OBJECT DriverObject);
 NTSTATUS APIProxyCreateClose(_In_ PDEVICE_OBJECT DeviceObject, _In_ PIRP Irp);
 NTSTATUS APIProxyDeviceControl(_In_ PDEVICE_OBJECT DeviceObject, _In_ PIRP Irp);
 
 
 //General.h
-NTSTATUS APIProxyCloseHandle(HANDLE* FileHandle);
-NTSTATUS APIProxyAllocateVirtualMemory(AllocateVirtualMeomryInfo* AllocateMemoryInfo);
-NTSTATUS APIProxyProtectVirtualMemory(VirtualProtectInfo* MemoryProtectionInfo);
-NTSTATUS APIProxyReadVirtualMemory(ReadWriteVirtualMemoryInfo* ReadMemoryInfo);
-NTSTATUS APIProxyWriteVirtualMemory(ReadWriteVirtualMemoryInfo* WriteMemoryInfo);
-NTSTATUS APIProxyQuerySystemInformation(ULONG InformationClass, PVOID InformationData, ULONG* DataSize);
-NTSTATUS APIProxyQueueUserAPC(QueueUSerApcInfo* APCInfo);
-NTSTATUS APIProxyFreeVirtualMemory(FreeVirtualMeomryInfo* FreeMemoryInfo);
-NTSTATUS APIProxyUnLoadDriver(PUNICODE_STRING DriverRegistryPath);
-NTSTATUS APIProxyLoadDriver(PUNICODE_STRING DriverRegistryPath);
+NTSTATUS APIProxyCloseHandle(_In_ HANDLE* FileHandle);
+NTSTATUS APIProxyAllocateVirtualMemory(_In_ AllocateVirtualMeomryInfo* AllocateMemoryInfo);
+NTSTATUS APIProxyProtectVirtualMemory(_In_ VirtualProtectInfo* MemoryProtectionInfo);
+NTSTATUS APIProxyReadVirtualMemory(_Out_ ReadWriteVirtualMemoryInfo* ReadMemoryInfo);
+NTSTATUS APIProxyWriteVirtualMemory(_In_ ReadWriteVirtualMemoryInfo* WriteMemoryInfo);
+NTSTATUS APIProxyQuerySystemInformation(_In_ ULONG InformationClass, _Out_ PVOID InformationData, _In_ ULONG* DataSize);
+NTSTATUS APIProxyQueueUserAPC(_In_ QueueUSerApcInfo* APCInfo);
+NTSTATUS APIProxyFreeVirtualMemory(_In_ FreeVirtualMeomryInfo* FreeMemoryInfo);
+NTSTATUS APIProxyUnLoadDriver(_In_ PUNICODE_STRING DriverRegistryPath);
+NTSTATUS APIProxyLoadDriver(_In_ PUNICODE_STRING DriverRegistryPath);
 
 //FileSystem.h
-NTSTATUS APIProxyCreateFile(CreateFileInfo* FileInfo, HANDLE* FileHandle);
-NTSTATUS APIProxyOpenFile(CreateFileInfo* FileInfo, HANDLE* FileHandle);
-NTSTATUS APIProxyDeleteFile(WCHAR* FileName);
-NTSTATUS APIProxyWriteFile(ReadWriteData* WriteInfo);
-NTSTATUS APIProxyReadFile(ReadWriteData* ReadInfo);
-NTSTATUS APIProxyGetFileSize(HANDLE* FileHandle, FILE_STANDARD_INFORMATION* FileInfo);
-NTSTATUS APIProxyCreateSection(CreateSectionInfo* SectionInfo, HANDLE* SectionHandle);
-NTSTATUS APIProxyOpenSection(OpenSectionInfo* SectionInfo, HANDLE* SectionHandle);
-NTSTATUS APIProxyMapViewOfSection(MapViewOfSectionInfo* MapInfo);
-NTSTATUS APIProxyUnMapViewOfSection(UNMapViewOfSectionInfo* UnMapInfo);
+NTSTATUS APIProxyCreateFile(_In_ CreateFileInfo* FileInfo, _Out_ HANDLE* FileHandle);
+NTSTATUS APIProxyOpenFile(_In_ CreateFileInfo* FileInfo, _Out_ HANDLE* FileHandle);
+NTSTATUS APIProxyDeleteFile(_In_ WCHAR* FileName);
+NTSTATUS APIProxyWriteFile(_In_ ReadWriteData* WriteInfo);
+NTSTATUS APIProxyReadFile(_Inout_ ReadWriteData* ReadInfo);
+NTSTATUS APIProxyGetFileSize(_In_ HANDLE* FileHandle, _Out_ FILE_STANDARD_INFORMATION* FileInfo);
+NTSTATUS APIProxyCreateSection(_In_ CreateSectionInfo* SectionInfo, _Out_ HANDLE* SectionHandle);
+NTSTATUS APIProxyOpenSection(_In_ OpenSectionInfo* SectionInfo, _Out_ HANDLE* SectionHandle);
+NTSTATUS APIProxyMapViewOfSection(_In_ MapViewOfSectionInfo* MapInfo);
+NTSTATUS APIProxyUnMapViewOfSection(_In_ UNMapViewOfSectionInfo* UnMapInfo);
 
 
 //Thread.h
-NTSTATUS APIProxyOpenThread(HANDLE* TID, HANDLE* ThreadHandle);
-NTSTATUS APIProxySetThreadContext(ThreadContextInfo* ThreadInfo);
-NTSTATUS APIProxyGetThreadContext(ThreadContextInfo* ThreadInfo);
+NTSTATUS APIProxyOpenThread(_In_ HANDLE* TID, _Out_ HANDLE* ThreadHandle);
+NTSTATUS APIProxySetThreadContext(_In_ ThreadContextInfo* ThreadInfo);
+NTSTATUS APIProxyGetThreadContext(_Out_ ThreadContextInfo* ThreadInfo);
 
 
 //Process.h
-NTSTATUS APIProxyTerminateProcess(DWORD64* PID);
-NTSTATUS APIProxyOpenProcess(HANDLE* PID, HANDLE* ProcessHandle);
-NTSTATUS APIProxySuspendProcess(HANDLE* PID);
-NTSTATUS APIProxyResumeProcess(HANDLE* PID);
+NTSTATUS APIProxyTerminateProcess(_In_ DWORD64* PID);
+NTSTATUS APIProxyOpenProcess(_In_ HANDLE* PID, _Out_ HANDLE* ProcessHandle);
+NTSTATUS APIProxySuspendProcess(_In_ HANDLE* PID);
+NTSTATUS APIProxyResumeProcess(_In_ HANDLE* PID);
 
+//Registry.h
+NTSTATUS APIProxyCreateKey(_In_ OpenCreateRegistryInfo* CreateKeyInfo, _Out_ HANDLE* NewKeyHandle);
+NTSTATUS APIProxyOpenKey(_In_ OpenCreateRegistryInfo* OpenKeyInfo, _Out_ HANDLE* NewKeyHandle);
+NTSTATUS APIProxyDeleteRegistryKey(_In_ HANDLE KeyHandle);
+NTSTATUS APIProxyRegistrySetValue(_In_ RegistrySetValueInfo* SetValueInfo);
+NTSTATUS APIProxyRegistryQueryValue(_In_ RegistryQueryKeyValueInfo* QueryValueInfo);
 
 //Utility.h
-DWORD64 NTAPI APIProxyGetPIDFromProcessName(WCHAR* ProcessName);
-DWORD64 NTAPI APIProxyGetAnyTIDFromPID(DWORD64 PID);
-VOID NTAPI APIProxyApcKernelRoutine(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* NormalRoutine, _Inout_ PVOID* NormalContext, _Inout_ PVOID* SystemArgument1, _Inout_ PVOID* SystemArgument2);
-VOID NTAPI APIProxyApcAlertThread(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* NormalRoutine, _Inout_ PVOID* NormalContext, _Inout_ PVOID* SystemArgument1, _Inout_ PVOID* SystemArgument2);
+DWORD64  APIProxyGetPIDFromProcessName(WCHAR* ProcessName);
+DWORD64  APIProxyGetAnyTIDFromPID(DWORD64 PID);
+VOID  APIProxyApcKernelRoutine(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* NormalRoutine, _Inout_ PVOID* NormalContext, _Inout_ PVOID* SystemArgument1, _Inout_ PVOID* SystemArgument2);
+VOID  APIProxyApcAlertThread(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* NormalRoutine, _Inout_ PVOID* NormalContext, _Inout_ PVOID* SystemArgument1, _Inout_ PVOID* SystemArgument2);

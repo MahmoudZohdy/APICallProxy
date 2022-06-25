@@ -160,6 +160,7 @@
     <ClInclude Include="IOCTLCodes.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="Prototypes.h" />
+    <ClInclude Include="Registry.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="Utility.h" />

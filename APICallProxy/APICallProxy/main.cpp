@@ -8,6 +8,7 @@
 #include "FileSystem.h"
 #include "Process.h"
 #include "Thread.h"
+#include "Registry.h"
 #include "General.h"
 #include "Utility.h"
 
@@ -534,6 +535,75 @@ NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 
 		RtlInitUnicodeString(&RegPath, UserRegPath);
 		Status = APIProxyUnLoadDriver(&RegPath);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_CREATE_REGISTRY_KEY:
+	{
+		auto CreateRegInfo = (OpenCreateRegistryInfo*)UserData;
+		HANDLE NewKeyHandle = NULL;
+
+		if (DataSize < sizeof(OpenCreateRegistryInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyCreateKey(CreateRegInfo, &NewKeyHandle);
+		
+		HANDLE* Output = (HANDLE*)OutBuffer;
+		*Output = NewKeyHandle;
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_OPEN_REGISTRY_KEY:
+	{
+		auto OpenRegInfo = (OpenCreateRegistryInfo*)UserData;
+		HANDLE NewKeyHandle = NULL;
+
+		if (DataSize < sizeof(OpenCreateRegistryInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyOpenKey(OpenRegInfo, &NewKeyHandle);
+
+		HANDLE* Output = (HANDLE*)OutBuffer;
+		*Output = NewKeyHandle;
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_DELETE_REGISTRY_KEY:
+	{
+		auto KeyHandle = (HANDLE*)UserData;
+		Status = APIProxyDeleteRegistryKey(*KeyHandle);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_REGISTRY_SET_KEY:
+	{
+		auto SetValueInfo = (RegistrySetValueInfo*)UserData;
+		if (DataSize < sizeof(RegistrySetValueInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyRegistrySetValue(SetValueInfo);
+	}
+	break;
+
+	case IOCTL_API_PROXY_REGISTRY_QUERY_KEY_VALUE:
+	{
+		auto QueryKeyValueInfo = (RegistryQueryKeyValueInfo*)UserData;
+		if (DataSize < sizeof(RegistryQueryKeyValueInfo)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyRegistryQueryValue(QueryKeyValueInfo);
 
 	}
 	break;

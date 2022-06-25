@@ -1,7 +1,7 @@
 #pragma once
 
 
-DWORD64 NTAPI APIProxyGetPIDFromProcessName(_In_ WCHAR* ProcessName) {
+DWORD64  APIProxyGetPIDFromProcessName(_In_ WCHAR* ProcessName) {
 	DWORD64 PID = 0;
 	PSYSTEM_PROCESSES ProcessInfo = NULL;
 	ULONG DataSize = 0;
@@ -60,7 +60,7 @@ DWORD64 NTAPI APIProxyGetPIDFromProcessName(_In_ WCHAR* ProcessName) {
 	return PID;
 }
 
-DWORD64 NTAPI APIProxyGetAnyTIDFromPID(_In_ DWORD64 PID) {
+DWORD64  APIProxyGetAnyTIDFromPID(_In_ DWORD64 PID) {
 	DWORD64 TID = 0;
 
 	PSYSTEM_PROCESSES ProcessInfo = NULL;
@@ -98,7 +98,7 @@ DWORD64 NTAPI APIProxyGetAnyTIDFromPID(_In_ DWORD64 PID) {
 	return TID;
 }
 
-VOID NTAPI APIProxyApcKernelRoutine(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* NormalRoutine, _Inout_ PVOID* NormalContext, _Inout_ PVOID* SystemArgument1, _Inout_ PVOID* SystemArgument2) {
+VOID  APIProxyApcKernelRoutine(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* NormalRoutine, _Inout_ PVOID* NormalContext, _Inout_ PVOID* SystemArgument1, _Inout_ PVOID* SystemArgument2) {
 	UNREFERENCED_PARAMETER(NormalRoutine);
 	UNREFERENCED_PARAMETER(NormalContext);
 	UNREFERENCED_PARAMETER(SystemArgument1);
@@ -108,7 +108,7 @@ VOID NTAPI APIProxyApcKernelRoutine(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* No
 	ExFreePool(Apc);
 }
 
-VOID NTAPI APIProxyApcAlertThread(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* NormalRoutine, _Inout_ PVOID* NormalContext, _Inout_ PVOID* SystemArgument1, _Inout_ PVOID* SystemArgument2) {
+VOID  APIProxyApcAlertThread(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* NormalRoutine, _Inout_ PVOID* NormalContext, _Inout_ PVOID* SystemArgument1, _Inout_ PVOID* SystemArgument2) {
 	UNREFERENCED_PARAMETER(NormalRoutine);
 	UNREFERENCED_PARAMETER(NormalContext);
 	UNREFERENCED_PARAMETER(SystemArgument1);

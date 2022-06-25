@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "APCInjection", "APCInjectio
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DisableDSE", "DisableDSE\DisableDSE.vcxproj", "{E9415243-3A91-4DA8-A331-CA475DB3B845}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegisterLoadDriver", "RegisterLoadDriver\RegisterLoadDriver.vcxproj", "{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -69,6 +71,18 @@ Global
 		{E9415243-3A91-4DA8-A331-CA475DB3B845}.Release|x64.Build.0 = Release|x64
 		{E9415243-3A91-4DA8-A331-CA475DB3B845}.Release|x86.ActiveCfg = Release|Win32
 		{E9415243-3A91-4DA8-A331-CA475DB3B845}.Release|x86.Build.0 = Release|Win32
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Debug|ARM.ActiveCfg = Debug|Win32
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Debug|x64.ActiveCfg = Debug|x64
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Debug|x64.Build.0 = Debug|x64
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Debug|x86.ActiveCfg = Debug|Win32
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Debug|x86.Build.0 = Debug|Win32
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Release|ARM.ActiveCfg = Release|Win32
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Release|ARM64.ActiveCfg = Release|Win32
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Release|x64.ActiveCfg = Release|x64
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Release|x64.Build.0 = Release|x64
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Release|x86.ActiveCfg = Release|Win32
+		{1D21E6D1-5ECC-4DDD-BCB8-9B398D135DF5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

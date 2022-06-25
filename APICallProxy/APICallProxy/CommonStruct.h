@@ -105,3 +105,29 @@ typedef struct _QueueUSerApcInfo {
 	_In_ PVOID		ArgumentData;
 
 } QueueUSerApcInfo, * PQueueUSerApcInfo;
+
+
+typedef struct _OpenCreateRegistryInfo {
+	_In_ WCHAR			RegistryKeyPath[600];
+	_In_ ACCESS_MASK	DesiredAccess;			//refere to MSDN for information
+	OUT  ULONG			CreateDisposition;		//Key created or opened ( used only in ZwCreateKey() )
+
+} OpenCreateRegistryInfo, * POpenCreateRegistryInfo;
+
+typedef struct _RegistrySetValueInfo {
+	_In_ WCHAR			KeyName[600];
+	_In_ HANDLE			KeyHandle;			
+	_In_ ULONG			Type;
+	_In_ PVOID			Date;
+	_In_ ULONG			DateSize;
+
+} RegistrySetValueInfo, * PRegistrySetValueInfo;
+
+typedef struct _RegistryQueryKeyValueInfo {
+	_In_ HANDLE			KeyHandle;
+	_In_ WCHAR			ValueName[100];
+	_In_ ULONG			KeyValueInformationClass;
+	_In_ PVOID			Data;
+	_In_ ULONG			DateSize;
+	_In_ PULONG         ResultLength;
+} RegistryQueryKeyValueInfo, * PRegistryQueryKeyValueInfo;

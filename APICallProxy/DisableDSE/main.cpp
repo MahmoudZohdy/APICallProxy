@@ -68,7 +68,6 @@ int main(int argc, WCHAR* argv[])
 	SystemInformationptr.InformationClass = SystemModuleInformation;
 	Status = DeviceIoControl(hDevice, IOCTL_API_PROXY_QUERY_SYSTEM_INFORMATION, &SystemInformationptr, sizeof(QuerySystemInformationInfo), NULL, NULL, &returned, nullptr);
 
-
 	//allocate memory for module info
 	Allocate.BaseAddress = NULL;
 	Allocate.RegionSize = SystemInformationptr.DataSize;
