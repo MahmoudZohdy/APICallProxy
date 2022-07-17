@@ -1,16 +1,18 @@
 #include <ntifs.h>
 #include <ntddk.h>
 #include <wdm.h>
+#include <wsk.h>
 #include "IOCTLCodes.h"
 #include "Struct.h"
 #include "CommonStruct.h"
 #include "Prototypes.h"
+#include "Utility.h"
 #include "FileSystem.h"
 #include "Process.h"
 #include "Thread.h"
 #include "Registry.h"
+#include "Network.h"
 #include "General.h"
-#include "Utility.h"
 
 
 // DriverEntry
@@ -604,6 +606,159 @@ NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 		}
 
 		Status = APIProxyRegistryQueryValue(QueryKeyValueInfo);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_WSAStartup:
+	{
+		auto WSAStartInfo = (WSAStartCleanUp*)UserData;
+		if (DataSize < sizeof(WSAStartCleanUp)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyWSAStartup(WSAStartInfo);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_WSACleanup:
+	{
+		auto WSASCleanUpInfo = (WSAStartCleanUp*)UserData;
+		if (DataSize < sizeof(WSAStartCleanUp)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyWSACleanup(WSASCleanUpInfo);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_Socket:
+	{
+		auto SocketInfo = (SocketStruct*)UserData;
+		if (DataSize < sizeof(SocketStruct)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxySocket(&(SocketInfo->WSAStartCleanUpptr), (PKSOCKET*)&(SocketInfo->Socket), 
+			SocketInfo->Domain, SocketInfo->Type, SocketInfo->Protocol, SocketInfo->Flags);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_CloseSocket:
+	{
+		auto SocketPtr = (PVOID*)UserData;
+		if (DataSize < sizeof(PVOID)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyCloseSocket((PKSOCKET)*SocketPtr);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_Connect:
+	{
+		auto ConnectInfo = (ConnectStruct*)UserData;
+		if (DataSize < sizeof(ConnectStruct)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyConnect(ConnectInfo);
+		DbgPrint("Status %x\n", Status);
+	}
+	break;
+
+	case IOCTL_API_PROXY_Send:
+	{
+		auto SendInfo = (SendRecvStruct*)UserData;
+		if (DataSize < sizeof(SendRecvStruct)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxySend(SendInfo);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_Recv:
+	{
+		auto RecvInfo = (SendRecvStruct*)UserData;
+		if (DataSize < sizeof(SendRecvStruct)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyRecv(RecvInfo);
+
+	}
+	break;
+
+
+	case IOCTL_API_PROXY_Bind:
+	{
+		auto BindInfo = (BindStruct*)UserData;
+		if (DataSize < sizeof(BindStruct)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyBind(BindInfo);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_Accept:
+	{
+		auto AcceptInfo = (AcceptStruct*)UserData;
+		if (DataSize < sizeof(AcceptStruct)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyAccept(AcceptInfo);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_listen:
+	{
+		APIProxyListen();
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_GetAddrInfo:
+	{
+		auto AddrInfo = (GetAddrInfoStruct*)UserData;
+		if (DataSize < sizeof(GetAddrInfoStruct)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+
+		Status = APIProxtGetAddrInfo(AddrInfo);
+
+	}
+	break;
+
+	case IOCTL_API_PROXY_FreeAddrInfo:
+	{
+		auto AddrInfo = (struct addrinfo*)UserData;
+		if (DataSize < sizeof(struct addrinfo*)) {
+			Status = STATUS_BUFFER_TOO_SMALL;
+			break;
+		}
+
+		Status = APIProxyFreeAddrInfo(AddrInfo);
 
 	}
 	break;

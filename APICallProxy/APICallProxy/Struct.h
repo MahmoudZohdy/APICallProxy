@@ -93,3 +93,36 @@ typedef struct _SYSTEM_BASIC_INFORMATION
 
 #define SystemBasicInformation 0
 
+//Network Struct
+
+#define MEMORY_TAG            'API '
+
+typedef int       socklen_t;
+typedef intptr_t  ssize_t;
+
+typedef struct _KSOCKET_ASYNC_CONTEXT
+{
+    KEVENT CompletionEvent;
+    PIRP Irp;
+} KSOCKET_ASYNC_CONTEXT, * PKSOCKET_ASYNC_CONTEXT;
+
+typedef struct _KSOCKET
+{
+    PWSK_SOCKET	WskSocket;
+
+    union
+    {
+        PVOID WskDispatch;
+
+        PWSK_PROVIDER_CONNECTION_DISPATCH WskConnectionDispatch;
+        PWSK_PROVIDER_LISTEN_DISPATCH WskListenDispatch;
+        PWSK_PROVIDER_DATAGRAM_DISPATCH WskDatagramDispatch;
+#if (NTDDI_VERSION >= NTDDI_WIN10_RS2)
+        PWSK_PROVIDER_STREAM_DISPATCH WskStreamDispatch;
+#endif
+    };
+
+    KSOCKET_ASYNC_CONTEXT AsyncContext;
+} KSOCKET, * PKSOCKET;
+
+typedef struct _KSOCKET KSOCKET, * PKSOCKET;

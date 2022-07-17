@@ -85,8 +85,117 @@ NTSTATUS APIProxyDeleteRegistryKey(_In_ HANDLE KeyHandle);
 NTSTATUS APIProxyRegistrySetValue(_In_ RegistrySetValueInfo* SetValueInfo);
 NTSTATUS APIProxyRegistryQueryValue(_In_ RegistryQueryKeyValueInfo* QueryValueInfo);
 
+//Network.h
+DWORD32 APIProxyhtonl(DWORD32 hostlong);
+unsigned short APIProxyhtons(unsigned short hostshort);
+DWORD32 APIProxyntohl(DWORD32 netlong);
+unsigned short  APIProxyntohs(unsigned short netshort);
+NTSTATUS  APIProxyWSAStartup(OUT WSAStartCleanUp* WSASInfo);
+NTSTATUS APIProxyWSACleanup(_In_ WSAStartCleanUp* WSASInfo);
+NTSTATUS APIProxtGetAddrInfo(GetAddrInfoStruct* AddrInfo);
+NTSTATUS APIProxyFreeAddrInfo(struct addrinfo* AddrInfo);
+NTSTATUS APIProxySocket(WSAStartCleanUp* WSAInfo, PKSOCKET* Socket, int Domain, int Type, int Protocol, _In_ ULONG Flags);
+NTSTATUS APIProxyCloseSocket(PKSOCKET Socket);
+NTSTATUS APIProxyConnect(ConnectStruct* ConnectInfo);
+NTSTATUS APIProxyListen();
+NTSTATUS APIProxyBind(BindStruct* BindInfo);
+NTSTATUS APIProxyAccept(AcceptStruct* AcceptInfo);
+NTSTATUS APIProxySend(SendRecvStruct* SendInfo);
+NTSTATUS APIProxyRecv(SendRecvStruct* RecvInfo);
+
+
 //Utility.h
 DWORD64  APIProxyGetPIDFromProcessName(WCHAR* ProcessName);
 DWORD64  APIProxyGetAnyTIDFromPID(DWORD64 PID);
 VOID  APIProxyApcKernelRoutine(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* NormalRoutine, _Inout_ PVOID* NormalContext, _Inout_ PVOID* SystemArgument1, _Inout_ PVOID* SystemArgument2);
 VOID  APIProxyApcAlertThread(_In_ PKAPC Apc, _Inout_ PKNORMAL_ROUTINE* NormalRoutine, _Inout_ PVOID* NormalContext, _Inout_ PVOID* SystemArgument1, _Inout_ PVOID* SystemArgument2);
+
+DWORD32 APIProxyhtonl(DWORD32 hostlong);
+unsigned short APIProxyhtons(unsigned short hostshort);
+DWORD32 APIProxyntohl(DWORD32 netlong);
+unsigned short APIProxyntohs(unsigned short netshort);
+
+NTSTATUS APIProxyAsyncContextCompletionRoutine(
+    _In_ PDEVICE_OBJECT	DeviceObject,
+    _In_ PIRP Irp,
+    _In_ PKEVENT CompletionEvent
+);
+
+NTSTATUS APIProxyAsyncContextAllocate(_Out_ PKSOCKET_ASYNC_CONTEXT AsyncContext);
+VOID APIProxyAsyncContextFree(_In_ PKSOCKET_ASYNC_CONTEXT AsyncContext);
+VOID APIProxyAsyncContextReset(_In_ PKSOCKET_ASYNC_CONTEXT AsyncContext);
+
+NTSTATUS APIProxyAsyncContextWaitForCompletion(
+    _In_ PKSOCKET_ASYNC_CONTEXT AsyncContext,
+    _Inout_ PNTSTATUS Status
+);
+
+NTSTATUS APIProxyAddrInfoToAddrInfoEx(
+    _In_ PADDRINFOA AddrInfo,
+    _Out_ PADDRINFOEXW* AddrInfoEx
+);
+
+NTSTATUS APIProxyAddrInfoExToAddrInfo(
+    _In_ PADDRINFOEXW AddrInfoEx,
+    _Out_ PADDRINFOA* AddrInfo
+);
+
+VOID APIProxyFreeAddrInfoUtility(_In_ PADDRINFOA AddrInfo);
+VOID APIProxyFreeAddrInfoEx(_In_ PADDRINFOEXW AddrInfo);
+
+NTSTATUS KsGetAddrInfo(
+    WSAStartCleanUp* WSAInfo,
+    _In_ PUNICODE_STRING NodeName,
+    _In_ PUNICODE_STRING ServiceName,
+    _In_ PADDRINFOEXW Hints,
+    _Out_ PADDRINFOEXW* Result
+);
+
+VOID KsFreeAddrInfo(
+    WSAStartCleanUp* WSAInfo,
+    _In_ PADDRINFOEXW AddrInfo
+);
+
+NTSTATUS KsCreateSocket(
+    WSAStartCleanUp* WSAInfo,
+    _Out_ PKSOCKET* Socket,
+    _In_ ADDRESS_FAMILY AddressFamily,
+    _In_ USHORT SocketType,
+    _In_ ULONG Protocol,
+    _In_ ULONG Flags
+);
+
+NTSTATUS KsCloseSocket(_In_ PKSOCKET Socket);
+
+//TODO: Make the Bind work for all type of socket
+NTSTATUS KsBind(_In_ PKSOCKET Socket, _In_ PSOCKADDR LocalAddress);
+
+NTSTATUS KsAccept(
+    _In_ PKSOCKET Socket,
+    _Out_ PKSOCKET* NewSocket,
+    _Out_opt_ PSOCKADDR LocalAddress,
+    _Out_opt_ PSOCKADDR RemoteAddress);
+
+NTSTATUS KsConnect(_In_ PKSOCKET Socket, _In_ PSOCKADDR RemoteAddress);
+
+NTSTATUS KsSendRecv(
+    _In_ PKSOCKET Socket,
+    _In_ PVOID Buffer,
+    _Inout_ PULONG Length,
+    _In_ ULONG Flags,
+    _In_ BOOLEAN Send
+);
+
+NTSTATUS KsSend(
+    _In_ PKSOCKET Socket,
+    _In_ PVOID Buffer,
+    _Inout_ PULONG Length,
+    _In_ ULONG Flags
+);
+
+NTSTATUS KsRecv(
+    _In_ PKSOCKET Socket,
+    _In_ PVOID Buffer,
+    _Inout_ PULONG Length,
+    _In_ ULONG Flags
+);
