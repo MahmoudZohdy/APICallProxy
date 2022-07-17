@@ -2,7 +2,7 @@
 
 This Project is for Windows API Call Obfuscation to make static/Dynamic analysis of a program harder, and to make it harder to recognize and extract the sequance of Windows API the application Call.
 
-It Work by replacing normal calls to windows API like **CreateFile**, **WriteFile**, **OpenProcess**,.. with a **DeviceIoControl** with the appropriate **IOCTL** code
+To use it all what you need to do is Call **DeviceIoControl** with the appropriate **IOCTL** code insted of calling normal Windows API like **CreateFile**, **WriteFile**, **OpenProcess**,..
 
 So if you want to Create File insted of calling **CreateFile()** API you call **DeviceIoControl()** with IOCTL Code **IOCTL_API_PROXY_CREATEFILE**
 
