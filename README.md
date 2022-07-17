@@ -11,8 +11,8 @@ I Create sample Client that will do the following:
 1 - APCInjection.exe : APC injection 
 2 - DisableDSE.exe : Sample code to Disable Signing Policy(DSE)
 3-  RegisterLoadDriver.exe : Register and Load Driver using DeviceIoControl()
-4-  WinsockServer.exe  :  WinSock Server same as [Microsoft implementation](https://docs.microsoft.com/en-us/windows/win32/winsock/complete-server-code)
-5-  WinsockClient.exe  :  WinSock Client same as [Microsoft implementation](https://docs.microsoft.com/en-us/windows/win32/winsock/complete-client-code)
+4-  WinsockServer.exe  :  WinSock Server same as Microsoft implementation (https://docs.microsoft.com/en-us/windows/win32/winsock/complete-server-code)
+5-  WinsockClient.exe  :  WinSock Client same as Microsoft implementation (https://docs.microsoft.com/en-us/windows/win32/winsock/complete-client-code)
 
 
 Note that the APCInjector.exe only work as x64 bit application on x64 bit windows because the shellcode is x64 bit
