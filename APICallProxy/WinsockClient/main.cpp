@@ -90,12 +90,12 @@ int main() {
 
 	Status = DeviceIoControl(hDevice, IOCTL_API_PROXY_GetAddrInfo, &AddrInfo, sizeof(GetAddrInfoStruct), NULL, NULL, &returned, FALSE);
 	if (!Status) {
-		printf("[-] Failed IOCTL_API_PROXY_GetAddrInfo Error Code: 0x%x\n", GetLastError());
+		printf("[-] Failed to Rsolve Server Addres Error Code: 0x%x\n", GetLastError());
 		return 0;
 	}
-	else {
-		printf("[+] Success IOCTL_API_PROXY_GetAddrInfo Error Code: 0x%x\n", GetLastError());
-	}
+
+	printf("[+] Server Address Resolved Successfully\n");
+
 
 	ConnectInfo.Socket = SocketInfo.Socket;
 	ConnectInfo.AddrInfo = res;
