@@ -111,7 +111,7 @@ NTSTATUS APIProxyReadVirtualMemory(ReadWriteVirtualMemoryInfo* ReadMemoryInfo) {
 	return Status;
 }
 
-NTSTATUS APIProxyWriteVirtualMemory(ReadWriteVirtualMemoryInfo* WriteMemoryInfo) {
+NTSTATUS APIProxyWriteVirtualMemory(_In_ ReadWriteVirtualMemoryInfo* WriteMemoryInfo) {
 	NTSTATUS Status = STATUS_SUCCESS;
 	PEPROCESS Process = NULL;
 
@@ -125,6 +125,7 @@ NTSTATUS APIProxyWriteVirtualMemory(ReadWriteVirtualMemoryInfo* WriteMemoryInfo)
 
 		SIZE_T Result;
 		Status = MmCopyVirtualMemory(PsGetCurrentProcess(), WriteMemoryInfo->Data, Process, WriteMemoryInfo->BaseAddress, WriteMemoryInfo->DataLen, KernelMode, &Result);
+
 #if DEBUG
 		if (!NT_SUCCESS(Status))
 			DbgPrint("APICallProxy: Error Writting Virtual Address Space using MmCopyVirtualMemory  Failed Status Code %x\n", Status);

@@ -48,7 +48,7 @@ typedef struct _ReadWriteVirtualMemoryInfo {
 	_In_ HANDLE     ProcessHandle;
 	_In_ SIZE_T	    DataLen;
 	_In_ PVOID		BaseAddress;
-	_In_ BYTE* Data;
+	_In_ PVOID		Data;
 
 } ReadWriteVirtualMemoryInfo, * PReadWriteVirtualMemoryInfo;
 

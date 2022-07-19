@@ -9,7 +9,7 @@ So if you want to Create File insted of calling **CreateFile()** API you call **
 ```
 I Create sample Client that will do the following:
 1 - APCInjection.exe : APC injection 
-2 - DisableDSE.exe : Sample code to Disable Signing Policy(DSE)
+2 - DisableDSE.exe : Sample code to Disable Signing Policy(DSE), tested on windows 10 21H1 (it might crash on other windows version)
 3-  RegisterLoadDriver.exe : Register and Load Driver using DeviceIoControl()
 4-  WinsockServer.exe  :  WinSock Server same as Microsoft implementation (https://docs.microsoft.com/en-us/windows/win32/winsock/complete-server-code)
 5-  WinsockClient.exe  :  WinSock Client same as Microsoft implementation (https://docs.microsoft.com/en-us/windows/win32/winsock/complete-client-code)
@@ -19,7 +19,7 @@ Note that the APCInjector.exe only work as x64 bit application on x64 bit window
 
 i tested the Driver and the client on windows 10 0x64 and window 8.1 x64/x86 bit
 
-Note that the network operation only support the TCP connection for now will add UDP connection soon.
+Note that the network operation only support the TCP connection for now, will add UDP connection soon.
 
 The Communication Between the Driver and User-mode happens using METHOD_NEITHER i made it very easy to change the communication method (METHOD_BUFFERED,..), you only need to change a couple of lines in the source code and it will work normally
 ```
