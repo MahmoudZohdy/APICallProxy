@@ -6,7 +6,9 @@ NTSTATUS APIProxyTerminateProcess(DWORD64* PID) {
 	PEPROCESS Process;
 
 	__try {
+
 		Status = PsLookupProcessByProcessId((HANDLE)(*PID), &Process);
+
 		if (!NT_SUCCESS(Status)) {
 			return Status;
 		}

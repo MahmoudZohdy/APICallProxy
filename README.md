@@ -13,7 +13,8 @@ I Create sample Client that will do the following:
 3-  RegisterLoadDriver.exe : Register and Load Driver using DeviceIoControl()
 4-  WinsockServer.exe  :  WinSock Server same as Microsoft implementation (https://docs.microsoft.com/en-us/windows/win32/winsock/complete-server-code)
 5-  WinsockClient.exe  :  WinSock Client same as Microsoft implementation (https://docs.microsoft.com/en-us/windows/win32/winsock/complete-client-code)
-
+6-  ReverseShellClient.exe: Reverse Shell Client
+7-  ReverseShellServer.exe: Reverse Shell Server
 
 Note that the APCInjector.exe only work as x64 bit application on x64 bit windows because the shellcode is x64 bit
 

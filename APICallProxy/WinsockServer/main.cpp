@@ -35,7 +35,6 @@ int main() {
 	printf("[+] initiates of the Winsock Successfully\n");
 
 
-
 	SocketInfo.WSAStartCleanUpptr.WskDispatchPtr = WSAInfo.WskDispatchPtr;
 	SocketInfo.WSAStartCleanUpptr.WskProviderPtr = WSAInfo.WskProviderPtr;
 	SocketInfo.WSAStartCleanUpptr.WskRegistrationPtr = WSAInfo.WskRegistrationPtr;
@@ -101,7 +100,7 @@ int main() {
 
 	do {
 
-		SendRecvStruct RecvInfo = { 0 };
+		SendRecvStruct RecvInfo = {0};
 		char RecvBuffer[1024] = { 0 };
 		RecvInfo.Socket = AcceptInfo.NewSocket;
 		RecvInfo.Buffer = RecvBuffer;
@@ -114,20 +113,19 @@ int main() {
 		
 		printf("[+] Client: %s\n", RecvBuffer);
 
-
 		SendInfo.Socket = AcceptInfo.NewSocket;
 		CHAR SendBufer[] = "Hello From Server Side\n";
-
 		SendInfo.Buffer = SendBufer;
-		SendInfo.BufferLen = 23;
+		SendInfo.BufferLen = 24;
 		Status = DeviceIoControl(hDevice, IOCTL_API_PROXY_Send, &SendInfo, sizeof(SendRecvStruct), NULL, NULL, &returned, FALSE);
 		if (!Status) {
 			printf("[-] Failed to Replay to the Client Error Code: 0x%x\n", GetLastError());
 			break;
 		}
-		else {
-			printf("[+] Server: %s\n", SendBufer);
-		}
+
+		printf("[+] Server: %s\n", SendBufer);
+		
+		Sleep(1000);
 
 	} while (1);
 
@@ -153,9 +151,9 @@ int main() {
 		printf("[-] Failed To Terminates use of the Winsock Error Code: 0x%x\n", GetLastError());
 	}
 
-	Status = DeviceIoControl(hDevice, IOCTL_API_PROXY_CLOSE_HANDLE, &WSAInfo, sizeof(WSAStartCleanUp), NULL, NULL, &returned, FALSE);
+	Status = DeviceIoControl(hDevice, IOCTL_API_PROXY_CLOSE_HANDLE, &hDevice, sizeof(HANDLE), NULL, NULL, &returned, FALSE);
 	if (!Status) {
-		printf("[-] Failed To Terminates use of the Winsock Error Code: 0x%x\n", GetLastError());
+		printf("[-] Failed To Close the Driver handle Error Code: 0x%x\n", GetLastError());
 	}
 
 	return 0;

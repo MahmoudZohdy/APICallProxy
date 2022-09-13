@@ -16,7 +16,6 @@ int main() {
 	SocketStruct	 SocketInfo = { 0 };
 	ConnectStruct	 ConnectInfo = { 0 };
 
-
 	HANDLE hDevice = CreateFile(L"\\\\.\\APICallProxy", GENERIC_WRITE, FILE_SHARE_WRITE, FALSE, OPEN_EXISTING, 0, FALSE);
 	if (hDevice == INVALID_HANDLE_VALUE) {
 		printf("[-] Failed To Open Driver Error Code: 0x%x\n", GetLastError());
@@ -31,7 +30,6 @@ int main() {
 	}
 
 	printf("[+] initiates of the Winsock Successfully\n");
-
 
 
 	SocketInfo.WSAStartCleanUpptr.WskDispatchPtr = WSAInfo.WskDispatchPtr;
@@ -56,16 +54,6 @@ int main() {
 	}
 
 	printf("[+] Created Connection Socket Successfully\n");
-
-
-	//struct addrinfo *result = NULL;
-	//struct addrinfo* ptr = NULL;
-	//struct addrinfo hints;
-
-	//ZeroMemory(&hints, sizeof(hints));
-	//hints.ai_family = AF_UNSPEC;
-	//hints.ai_socktype = SOCK_STREAM;
-	//hints.ai_protocol = IPPROTO_TCP;
 
 
 	GetAddrInfoStruct AddrInfo = { 0 };
@@ -124,7 +112,6 @@ int main() {
 		}
 
 		printf("[+] Client: %s\n", SendBufer);
-		
 
 		SendRecvStruct RecvInfo = { 0 };
 		char RecvBuffer[1024] = { 0 };
