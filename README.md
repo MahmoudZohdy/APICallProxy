@@ -79,6 +79,8 @@ The Communication Between the Driver and User-mode happens using METHOD_NEITHER 
 - [x] **Get_ProcessID_From_Process_Name**         not windows API but usefull utility (can use ZwQuerySystemInformation to do the same)
 
 
+Kindly note that this is only for educational purposes only
+
 # Reference
 
 https://github.com/hfiref0x/DSEFix 
