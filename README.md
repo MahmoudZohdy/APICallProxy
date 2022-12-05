@@ -8,6 +8,7 @@ To make it clearer if you want to do for example APC injection you would normall
  **OpenProcess()** , **VirtualAllocEx()**, **WriteProcessMemory()**, **OpenThread()**, **QueueUserAPC()**
 
 But with APICallProxy this is what the API calls would look like,
+
 1- **DeviceIoControl(,IOCTL_API_PROXY_OPEN_PROCESS,)**
 2- **DeviceIoControl(,IOCTL_API_PROXY_ALLOCATE_MEMORY_IN_PROCESS_USING_HANDLE,)**
 3- **DeviceIoControl(,IOCTL_API_PROXY_WRITE_PROCESS_MEMORY,)**
