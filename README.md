@@ -2,9 +2,21 @@
 
 This Project is for Windows API Call Obfuscation to make static/Dynamic analysis of a program harder, and to make it harder to recognize and extract the sequance of Windows API the application Call.
 
+It is a Kernel Proxy that gives the developer the ability to proxy windows API call and hide it behind **DeviceIoControl()** API, so instead of calling **CreateFile()** you will call **DeviceIoControl(,IOCTL_API_PROXY_CREATEFILE,)**, so if there is an API monitor tool or a sandbox all what are you going to see is a sequence of **DeviceIoControl()** calls.
+
+To make it clearer if you want to do for example APC injection you would normally call those sequence of API
+ **OpenProcess()** , **VirtualAllocEx()**, **WriteProcessMemory()**, **OpenThread()**, **QueueUserAPC()**
+
+But with APICallProxy this is what the API calls would look like,
+1- **DeviceIoControl(,IOCTL_API_PROXY_OPEN_PROCESS,)**
+2- **DeviceIoControl(,IOCTL_API_PROXY_ALLOCATE_MEMORY_IN_PROCESS_USING_HANDLE,)**
+3- **DeviceIoControl(,IOCTL_API_PROXY_WRITE_PROCESS_MEMORY,)**
+4- **DeviceIoControl(,IOCTL_API_PROXY_OPEN_THREAD,)**
+5- **DeviceIoControl(,IOCTL_API_PROXY_QUEUE_APC,)**
+
+
 To use it all what you need to do is Call **DeviceIoControl** with the appropriate **IOCTL** code insted of calling normal Windows API like **CreateFile**, **WriteFile**, **OpenProcess**,..
 
-So if you want to Create File insted of calling **CreateFile()** API you call **DeviceIoControl()** with IOCTL Code **IOCTL_API_PROXY_CREATEFILE**
 
 ```
 I Create sample Client that will do the following:
