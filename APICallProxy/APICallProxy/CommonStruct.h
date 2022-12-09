@@ -195,3 +195,12 @@ typedef struct _AcceptStruct {
 	OUT INT*					SocketLen;
 	OUT  PVOID					NewSocket;
 } AcceptStruct, * PAcceptStruct;
+
+
+
+typedef struct _CreateThreadStruct {
+	_In_ HANDLE				    ThreadHandle;
+	_In_ PVOID					StartAddress;
+	_In_ PVOID					Parameter;
+	OUT  DWORD64				TID;
+} CreateThreadStruct, * PCreateThreadStruct;

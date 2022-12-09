@@ -6,9 +6,6 @@
 #include "../APICallProxy/CommonStruct.h"
 
 
-#pragma comment(lib, "Ws2_32.lib")
-
-
 int main() {
 	BOOL Status = 1;
 	DWORD returned;

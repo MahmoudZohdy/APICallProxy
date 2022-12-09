@@ -291,6 +291,14 @@ NTSTATUS APIProxyDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 
 	break;
 
+	case IOCTL_API_PROXY_CREATE_THREAD:
+	{
+
+		
+	}
+
+	break;
+
 	case IOCTL_API_PROXY_ALLOCATE_MEMORY_IN_PROCESS_USING_HANDLE:
 	{
 		auto AllocateMemoryInfo = (AllocateVirtualMeomryInfo*)UserData;
